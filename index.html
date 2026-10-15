@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化學實驗室大冒險 - 高一化學深化互動遊戲</title>
+    <style>
+        :root {
+            --bg-color: #0b1329;
+            --panel-bg: #131c3b;
+            --primary: #00f2fe;
+            --primary-hover: #4facfe;
+            --accent: #00e676;
+            --danger: #ff5252;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(0, 242, 254, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+            background-image: radial-gradient(circle at 50% 20%, #1a2b5c 0%, var(--bg-color) 80%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 35px;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 3D 立體按鈕樣式 */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 24px;
+            margin: 15px 0;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0043a8, 0 12px 25px rgba(0,0,0,0.4);
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #0043a8, 0 15px 30px rgba(0, 114, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0043a8, 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            box-shadow: 0 6px 0 #0f172a, 0 12px 25px rgba(0,0,0,0.4);
+        }
+        .btn-secondary:active {
+            box-shadow: 0 2px 0 #0f172a, 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            box-shadow: 0 6px 0 #00796b, 0 12px 25px rgba(0,0,0,0.4);
+        }
+        .btn-accent:active {
+            box-shadow: 0 2px 0 #00796b, 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+        /* 音效開關控制按鈕 */
+        .audio-control {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            z-index: 20;
+        }
+        .audio-control:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 表單與輸入 */
+        .input-group {
+            margin: 25px 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            background: #0b1329;
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* 遊戲頂部狀態列 */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        .game-header span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* 倒數計時條 */
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #0b1329;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #00f2fe, #00e676);
+            transition: width 1s linear;
+        }
+
+        /* 題目卡片與選項 */
+        .question-box {
+            background: #0b1329;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #1b284f;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 18px;
+            border-radius: 14px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #23356b;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: #00796b !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+        }
+
+        .option-btn.wrong {
+            background: #b71c1c !important;
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 20px rgba(255, 82, 82, 0.4);
+        }
+
+        /* 動態鼓勵語與解析區塊 */
+        .feedback-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 12px;
+            background: #0b1329;
+            border-left: 6px solid var(--primary);
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .encouragement-tag {
+            display: inline-block;
+            background: rgba(0, 230, 118, 0.2);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #0b1329;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        th {
+            background: #1e293b;
+            color: var(--primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .error-tip {
+            color: var(--danger);
+            font-size: 0.95rem;
+            text-align: center;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+            border-radius: 24px;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <canvas id="fireworks-canvas"></canvas>
+
+        <button class="audio-control" id="audio-toggle">🔊 音效：關閉</button>
+
+        <!-- 1. 首頁畫面 -->
+        <div id="screen-home" class="screen active">
+            <h1>化學實驗室大冒險</h1>
+            <p>初高中銜接與高一核心化學沉浸式互動系統</p>
+            <div style="margin: 30px 0; text-align: center;">
+                <span style="font-size: 5rem; filter: drop-shadow(0 0 20px rgba(0,242,254,0.4));">⚗️</span>
+            </div>
+            <button class="btn" id="btn-to-intro">進入遊戲說明</button>
+            <button class="btn btn-secondary" id="btn-to-leaderboard">查看排行榜</button>
+        </div>
+
+        <!-- 2. 遊戲介紹頁 -->
+        <div id="screen-intro" class="screen">
+            <h2>遊戲規則與說明</h2>
+            <p>歡迎來到高一化學升級版挑戰！本系統包含兩大化學深度模組：</p>
+            <p><b>1. 基礎鞏固模組（初三銜接）：</b>元素符號、化合價規則、離子與溶解性基礎。</p>
+            <p><b>2. 高一深化模組（綜合推理）：</b>物質的量、離子反應方程式、氧化還原反應與化學計量等。</p>
+            <p><b>✨ 刺激機制：</b>每題附帶倒數計時、歡快答題特效、語音激勵與即時知識解析，通關更可解鎖絢麗煙花與本地排行榜！</p>
+            <button class="btn" id="btn-to-name">開始挑戰</button>
+            <button class="btn btn-secondary" id="btn-intro-home">返回首頁</button>
+        </div>
+
+        <!-- 3. 輸入玩家姓名 -->
+        <div id="screen-name" class="screen">
+            <h2>登記實驗員身份</h2>
+            <p>請輸入您的名字或座號，以便記錄排行榜成績：</p>
+            <div class="input-group">
+                <input type="text" id="player-name" placeholder="例如：高一化學組 — 張同學" maxlength="15">
+                <div class="error-tip" id="name-error-tip"></div>
+            </div>
+            <button class="btn" id="btn-validate-name">下一步：選擇挑戰難度</button>
+            <button class="btn btn-secondary" id="btn-name-intro">回上頁</button>
+        </div>
+
+        <!-- 4. 選擇難度 -->
+        <div id="screen-difficulty" class="screen">
+            <h2>選擇挑戰難度級別</h2>
+            <p>兩套獨立題庫，難度循序漸進：</p>
+            
+            <button class="btn btn-accent" id="btn-start-easy">
+                <b>簡單模式（基礎鞏固）</b><br>
+                <span style="font-size: 0.9rem; opacity: 0.9;">適合初三化學回顧，25秒/題</span>
+            </button>
+            <button class="btn" id="btn-start-hard">
+                <b>困難模式（高一深化推理）</b><br>
+                <span style="font-size: 0.9rem; opacity: 0.9;">結合物質的量與離子反應，15秒/題，挑戰高分</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-diff-back">回上頁</button>
+        </div>
+
+        <!-- 5. 遊戲闖關主畫面 -->
+        <div id="screen-game" class="screen">
+            <div class="game-header">
+                <div>實驗員：<span id="ui-player"></span></div>
+                <div>進度：<span id="ui-progress">1/5</span></div>
+                <div>得分：<span id="ui-score">0</span></div>
+            </div>
+
+            <div class="timer-container">
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+
+            <div class="question-box" id="ui-question">
+                載入中...
+            </div>
+
+            <div class="options-grid" id="ui-options">
+                <!-- 動態選項 -->
+            </div>
+
+            <div class="feedback-box" id="ui-feedback">
+                <div class="encouragement-tag" id="encouragement-text">太棒了！</div>
+                <div id="feedback-title" style="font-weight: bold; font-size: 1.1rem;"></div>
+                <p id="feedback-desc" style="margin-top: 8px; margin-bottom: 0; text-align: left;"></p>
+            </div>
+
+            <button class="btn btn-accent" id="next-btn" style="display: none; margin-top: 20px;">下一題</button>
+        </div>
+
+        <!-- 6. 成績結算頁 -->
+        <div id="screen-result" class="screen">
+            <h2>實驗結算報告</h2>
+            <div style="text-align: center; margin: 20px 0; position: relative; z-index: 11;">
+                <span style="font-size: 4rem;" id="result-emoji">🏆</span>
+                <h3 id="final-score-text" style="font-size: 2.2rem; margin-top: 10px; color: var(--primary);">最終得分：100分</h3>
+                <p id="result-comment" style="margin-top: 10px; font-size: 1.1rem;"></p>
+            </div>
+            <div style="position: relative; z-index: 11;">
+                <button class="btn" id="wrong-book-btn" style="display: none;">查看錯題溫習筆記</button>
+                <button class="btn btn-accent" id="btn-result-home">返回首頁</button>
+                <button class="btn btn-secondary" id="btn-result-leaderboard">查看排行榜</button>
+            </div>
+        </div>
+
+        <!-- 7. 排行榜畫面 -->
+        <div id="screen-leaderboard" class="screen">
+            <h2>實驗室英雄排行榜</h2>
+            <p>紀錄本機前幾名的化學菁英：</p>
+            <div id="leaderboard-content"></div>
+            <button class="btn btn-secondary" id="btn-lb-home">返回首頁</button>
+        </div>
+
+        <!-- 8. 錯題本畫面 -->
+        <div id="screen-wrong-book" class="screen">
+            <h2>錯題溫習筆記</h2>
+            <p>以下是您本次挑戰答錯或超時的題目，建議加強複習：</p>
+            <div id="wrong-list-content" style="max-height: 320px; overflow-y: auto; padding-right: 5px;"></div>
+            <button class="btn btn-secondary" id="btn-wb-back">返回結算頁</button>
+        </div>
+    </div>
+
+    <script>
+        // 安全初始化與事件綁定
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initGameApp();
+            } catch (e) {
+                console.error("遊戲初始化失敗:", e);
+            }
+        });
+
+        let audioCtx = null;
+        let isAudioEnabled = false;
+        let bgmInterval = null;
+
+        function initAudio() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.warn("Web Audio 初始化失敗", e);
+            }
+        }
+
+        function toggleAudio() {
+            initAudio();
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('audio-toggle');
+            if (isAudioEnabled) {
+                btn.innerText = "🔊 音效：開啟";
+                playBGM();
+            } else {
+                btn.innerText = "🔇 音效：關閉";
+                stopBGM();
+            }
+        }
+
+        function playCorrectSound() {
+            if (!isAudioEnabled || !audioCtx) return;
+            try {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.3);
+                    }, idx * 80);
+                });
+            } catch (e) {}
+        }
+
+        function playWrongSound() {
+            if (!isAudioEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {}
+        }
+
+        function playBGM() {
+            if (bgmInterval) return;
+            const chordProgression = [
+                [261.63, 329.63, 392.00],
+                [220.00, 261.63, 329.63],
+                [174.61, 220.00, 261.63],
+                [196.00, 246.94, 293.66]
+            ];
+            let step = 0;
+            bgmInterval = setInterval(() => {
+                if (!isAudioEnabled || !audioCtx) return;
+                try {
+                    const chord = chordProgression[step % chordProgression.length];
+                    step++;
+                    chord.forEach(freq => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq / 2, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 1.8);
+                    });
+                } catch (e) {}
+            }, 2000);
+        }
+
+        function stopBGM() {
+            if (bgmInterval) {
+                clearInterval(bgmInterval);
+                bgmInterval = null;
+            }
+        }
+
+        const questionBank = {
+            easy: [
+                {
+                    q: "下列元素符號書寫完全正確的是哪一個？",
+                    options: ["① 銅 cu", "② 鈉 NA", "③ 鎂 Mg", "④ 鈣 CA"],
+                    answer: 2,
+                    explanation: "化學元素符號書寫規則為「一大二小」。鎂的正確符號是 Mg；銅是 Cu；鈉是 Na；鈣是 Ca。"
+                },
+                {
+                    q: "空氣中體積分數約佔 78% 的氣體元素，其符號是什麼？",
+                    options: ["O", "N", "C", "H"],
+                    answer: 1,
+                    explanation: "空氣中體積分數最大的是氮氣（N₂），其元素名稱為氮，符號為 N。"
+                },
+                {
+                    q: "地殼中含量最多的金屬元素是什麼？",
+                    options: ["鐵 (Fe)", "鋁 (Al)", "鈣 (Ca)", "銅 (Cu)"],
+                    answer: 1,
+                    explanation: "地殼中元素含量由多到少前三位是：氧、矽、鋁。因此含量最多的金屬元素是鋁（Al）。"
+                },
+                {
+                    q: "已知氫元素通常顯 +1 價，氧元素顯 -2 價，請問水的正確化學式為何？",
+                    options: ["HO", "H₂O", "H₂O₂", "HO₂"],
+                    answer: 1,
+                    explanation: "根據化合價代數和為零規則：(+1) × 2 + (-2) × 1 = 0，因此水的化學式為 H₂O。"
+                },
+                {
+                    q: "鈣離子（Ca²⁺）與氯離子（Cl⁻）結合形成的化合物化學式為何？",
+                    options: ["CaCl", "CaCl₂", "Ca₂Cl", "Ca(Cl)₂"],
+                    answer: 1,
+                    explanation: "鈣離子帶 2 個正電荷，氯離子帶 1 個負電荷，需 2 個氯離子平衡電荷，即 CaCl₂。"
+                }
+            ],
+            hard: [
+                {
+                    q: "下列關於「物質的量」（摩爾 mol）的敘述，正確的是？",
+                    options: [
+                        "1 mol 任何物質都含有 6.02 × 10²³ 個分子",
+                        "阿伏加德羅常數的數值約為 6.02 × 10²³ mol⁻¹",
+                        "1 mol 水的質量是 18 g/mol",
+                        "摩爾質量與相對原子質量在數值上完全不同"
+                    ],
+                    answer: 1,
+                    explanation: "阿伏加德羅常數 N_A 的符號與數值約為 6.02 × 10²³ mol⁻¹。1 mol 水的質量為 18 g。"
+                },
+                {
+                    q: "在標況（STP）下，22.4 L 的任何氣體所含的分子數約為？",
+                    options: ["3.01 × 10²³", "6.02 × 10²³", "1.204 × 10²⁴", "無法確定"],
+                    answer: 1,
+                    explanation: "在標準狀況下，氣體摩爾體積約為 22.4 L/mol，故 22.4 L 氣體含有 1 mol 分子，即 6.02 × 10²³ 個分子。"
+                },
+                {
+                    q: "下列離子方程式書寫或改寫正確的是？",
+                    options: [
+                        "稀硫酸與氫氧化鈉反應：H⁺ + OH⁻ = H₂O",
+                        "碳酸鈣與鹽酸反應：CO₃²⁻ + 2H⁺ = H₂O + CO₂↑（碳酸鈣不拆）",
+                        "鐵粉插入硫酸銅溶液：Fe + Cu²⁺ = Fe²⁺ + Cu",
+                        "以上離子方程式全都不正確"
+                    ],
+                    answer: 2,
+                    explanation: "碳酸鈣（CaCO₃）難溶於水，在離子方程式中不能拆；鐵與硫酸銅置換反應離子方程式為 Fe + Cu²⁺ = Fe²⁺ + Cu。"
+                },
+                {
+                    q: "在氧化還原反應 3Cl₂ + 6KOH → 5KCl + KClO₃ + 3H₂O 中，被氧化與被還原的氯原子個數比為？",
+                    options: ["1 : 5", "5 : 1", "1 : 1", "3 : 1"],
+                    answer: 0,
+                    explanation: "反應中 Cl₂ 既是氧化劑又是還原劑。生成 KClO₃ 消耗 1 個氯原子（被氧化），生成 KCl 消耗 5 個氯原子（被還原），故比例為 1 : 5。"
+                },
+                {
+                    q: "配制 500 mL 0.1 mol/L 的 NaCl 溶液，需要稱量固體氯化鈉的質量是多少？（Na=23, Cl=35.5）",
+                    options: ["2.9 g", "5.85 g", "58.5 g", "1.17 g"],
+                    answer: 0,
+                    explanation: "質量 m = n × M = (0.5 L × 0.1 mol/L) × 58.5 g/mol = 2.925 g ≈ 2.9 g。"
+                }
+            ]
+        };
+
+        const encouragements = [
+            "太棒了！化學之星就是你！",
+            "反應完美，思維敏捷！",
+            "觀點精準，完全命中！",
+            "實驗大師，再接再厲！",
+            "化學原理掌握得爐火純青！"
+        ];
+
+        let currentScreen = 'screen-home';
+        let playerName = '';
+        let gameDifficulty = 'easy';
+        let activeQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let wrongQuestions = [];
+        let answeredCurrent = false;
+        let timerInterval = null;
+        let timeLeft = 0;
+        let maxTimePerQ = 20;
+
+        function initGameApp() {
+            // 綁定所有按鈕事件
+            document.getElementById('audio-toggle').onclick = toggleAudio;
+            document.getElementById('btn-to-intro').onclick = () => goToScreen('screen-intro');
+            document.getElementById('btn-to-leaderboard').onclick = showLeaderboard;
+            document.getElementById('btn-to-name').onclick = () => goToScreen('screen-name');
+            document.getElementById('btn-intro-home').onclick = () => goToScreen('screen-home');
+            document.getElementById('btn-validate-name').onclick = validateName;
+            document.getElementById('btn-name-intro').onclick = () => goToScreen('screen-intro');
+            document.getElementById('btn-start-easy').onclick = () => startGame('easy');
+            document.getElementById('btn-start-hard').onclick = () => startGame('hard');
+            document.getElementById('btn-diff-back').onclick = () => goToScreen('screen-name');
+            document.getElementById('next-btn').onclick = nextQuestion;
+            document.getElementById('wrong-book-btn').onclick = showWrongBook;
+            document.getElementById('btn-result-home').onclick = () => goToScreen('screen-home');
+            document.getElementById('btn-result-leaderboard').onclick = showLeaderboard;
+            document.getElementById('btn-lb-home').onclick = () => goToScreen('screen-home');
+            document.getElementById('btn-wb-back').onclick = () => goToScreen('screen-result');
+
+            // 名字輸入框 Enter 鍵支援
+            const nameInput = document.getElementById('player-name');
+            if (nameInput) {
+                nameInput.onkeypress = (event) => {
+                    if (event.key === 'Enter') validateName();
+                };
+            }
+        }
+
+        function goToScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                currentScreen = screenId;
+            }
+            if (screenId !== 'screen-result') {
+                stopFireworks();
+            }
+        }
+
+        function validateName() {
+            const nameInput = document.getElementById('player-name');
+            const errorTip = document.getElementById('name-error-tip');
+            const nameVal = nameInput.value.trim();
+            if (!nameVal) {
+                errorTip.innerText = "⚠️ 請輸入您的名字或座號才能繼續！";
+                nameInput.focus();
+                return;
+            }
+            errorTip.innerText = "";
+            playerName = nameVal;
+            goToScreen('screen-difficulty');
+        }
+
+        function startGame(difficulty) {
+            gameDifficulty = difficulty;
+            activeQuestions = [...questionBank[difficulty]];
+            activeQuestions.sort(() => Math.random() - 0.5);
+
+            currentIndex = 0;
+            score = 0;
+            wrongQuestions = [];
+            maxTimePerQ = (difficulty === 'easy') ? 25 : 15;
+
+            document.getElementById('ui-player').innerText = playerName;
+            goToScreen('screen-game');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            const qData = activeQuestions[currentIndex];
+            
+            document.getElementById('ui-progress').innerText = `${currentIndex + 1}/${activeQuestions.length}`;
+            document.getElementById('ui-score').innerText = score;
+            document.getElementById('ui-question').innerHTML = qData.q;
+
+            const optionsContainer = document.getElementById('ui-options');
+            optionsContainer.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = opt;
+                btn.onclick = () => selectAnswer(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('ui-feedback').classList.remove('show');
+            document.getElementById('next-btn').style.display = 'none';
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = maxTimePerQ;
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.width = '100%';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const percent = (timeLeft / maxTimePerQ) * 100;
+                timerBar.style.width = `${percent}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+            playWrongSound();
+
+            const qData = activeQuestions[currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            if (buttons[qData.answer]) {
+                buttons[qData.answer].classList.add('correct');
+            }
+
+            wrongQuestions.push({
+                q: qData.q,
+                userAns: "超時未作答",
+                correctAns: qData.options[qData.answer],
+                explanation: qData.explanation
+            });
+
+            document.getElementById('encouragement-text').innerText = "⏱️ 哎呀，時間到！";
+            document.getElementById('encouragement-text').style.color = "var(--danger)";
+            document.getElementById('feedback-title').innerText = "❌ 回答超時！";
+            document.getElementById('feedback-title').style.color = "var(--danger)";
+            document.getElementById('feedback-desc').innerHTML = `<b>知識解析：</b>${qData.explanation}`;
+            document.getElementById('ui-feedback').classList.add('show');
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+            clearInterval(timerInterval);
+
+            const qData = activeQuestions[currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            if (selectedIndex === qData.answer) {
+                playCorrectSound();
+                buttons[selectedIndex].classList.add('correct');
+                score += (gameDifficulty === 'hard') ? 20 : 10;
+                
+                const randomEnc = encouragements[Math.floor(Math.random() * encouragements.length)];
+                document.getElementById('encouragement-text').innerText = randomEnc;
+                document.getElementById('encouragement-text').style.color = "var(--accent)";
+                document.getElementById('feedback-title').innerText = "✔ 回答正確！";
+                document.getElementById('feedback-title').style.color = "var(--accent)";
+            } else {
+                playWrongSound();
+                buttons[selectedIndex].classList.add('wrong');
+                if (buttons[qData.answer]) {
+                    buttons[qData.answer].classList.add('correct');
+                }
+
+                wrongQuestions.push({
+                    q: qData.q,
+                    userAns: qData.options[selectedIndex],
+                    correctAns: qData.options[qData.answer],
+                    explanation: qData.explanation
+                });
+
+                document.getElementById('encouragement-text').innerText = "💡 沒關係，失敗為成功之母！";
+                document.getElementById('encouragement-text').style.color = "var(--danger)";
+                document.getElementById('feedback-title').innerText = "❌ 回答錯誤！";
+                document.getElementById('feedback-title').style.color = "var(--danger)";
+            }
+
+            document.getElementById('ui-score').innerText = score;
+            document.getElementById('feedback-desc').innerHTML = `<b>知識解析：</b>${qData.explanation}`;
+            document.getElementById('ui-feedback').classList.add('show');
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < activeQuestions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            goToScreen('screen-result');
+            document.getElementById('final-score-text').innerText = `最終得分：${score} 分`;
+            
+            let comment = "";
+            if (score >= 90) {
+                comment = "太強了！高一化學概念掌握得無懈可擊，化學實驗室大師！";
+                document.getElementById('result-emoji').innerText = "🌟";
+                startFireworks();
+            } else if (score >= 60) {
+                comment = "表現優異！基礎與深化知識都有水準以上的發揮！";
+                document.getElementById('result-emoji').innerText = "🧪";
+                startFireworks();
+            } else {
+                comment = "革命尚未成功，建議多複習錯題筆記，再挑戰一次高難度！";
+                document.getElementById('result-emoji').innerText = "💡";
+            }
+            document.getElementById('result-comment').innerText = comment;
+
+            const wrongBtn = document.getElementById('wrong-book-btn');
+            wrongBtn.style.display = (wrongQuestions.length > 0) ? 'block' : 'none';
+
+            saveToLeaderboard(playerName, score);
+        }
+
+        function saveToLeaderboard(name, sc) {
+            try {
+                let lb = JSON.parse(localStorage.getItem('chem_high_leaderboard') || '[]');
+                lb.push({ name: name, score: sc, date: new Date().toLocaleDateString() });
+                lb.sort((a, b) => b.score - a.score);
+                lb = lb.slice(0, 5);
+                localStorage.setItem('chem_high_leaderboard', JSON.stringify(lb));
+            } catch (e) {}
+        }
+
+        function showLeaderboard() {
+            goToScreen('screen-leaderboard');
+            let lb = [];
+            try {
+                lb = JSON.parse(localStorage.getItem('chem_high_leaderboard') || '[]');
+            } catch (e) {}
+            
+            const container = document.getElementById('leaderboard-content');
+
+            if (lb.length === 0) {
+                container.innerHTML = `<p style="margin: 20px 0;">目前尚無排行榜紀錄，快來挑戰第一名吧！</p>`;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>名次</th>
+                            <th>實驗員</th>
+                            <th>得分</th>
+                            <th>日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            lb.forEach((item, index) => {
+                html += `
+                    <tr>
+                        <td>#${index + 1}</td>
+                        <td>${item.name}</td>
+                        <td style="color: var(--primary); font-weight: bold;">${item.score}</td>
+                        <td>${item.date}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function showWrongBook() {
+            goToScreen('screen-wrong-book');
+            const container = document.getElementById('wrong-list-content');
+            let html = '';
+
+            wrongQuestions.forEach((item, index) => {
+                html += `
+                    <div style="background: #131c3b; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 12px; text-align: left;">
+                        <p style="color: var(--text-main); font-weight: bold; margin-bottom: 5px;">Q${index + 1}. ${item.q}</p>
+                        <p style="color: var(--danger); margin-bottom: 3px;">您的選擇：${item.userAns}</p>
+                        <p style="color: var(--accent); margin-bottom: 5px;">正確答案：${item.correctAns}</p>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0;"><b>解析：</b>${item.explanation}</p>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        let fwCanvas, fwCtx, fireworksAnimId;
+        let particles = [];
+
+        function startFireworks() {
+            fwCanvas = document.getElementById('fireworks-canvas');
+            if (!fwCanvas) return;
+            fwCanvas.style.display = 'block';
+            fwCtx = fwCanvas.getContext('2d');
+            fwCanvas.width = fwCanvas.parentElement.clientWidth;
+            fwCanvas.height = fwCanvas.parentElement.clientHeight;
+
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: fwCanvas.width / 2,
+                    y: fwCanvas.height / 2,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    alpha: 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 60%)`
+                });
+            }
+
+            loopFireworks();
+        }
+
+        function loopFireworks() {
+            if (!fwCtx || !fwCanvas) return;
+            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.alpha -= 0.02;
+
+                fwCtx.save();
+                fwCtx.globalAlpha = Math.max(p.alpha, 0);
+                fwCtx.fillStyle = p.color;
+                fwCtx.beginPath();
+                fwCtx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                fwCtx.fill();
+                fwCtx.restore();
+            });
+
+            particles = particles.filter(p => p.alpha > 0);
+            if (particles.length > 0) {
+                fireworksAnimId = requestAnimationFrame(loopFireworks);
+            } else {
+                if (currentScreen === 'screen-result') {
+                    for (let i = 0; i < 40; i++) {
+                        particles.push({
+                            x: Math.random() * fwCanvas.width,
+                            y: Math.random() * (fwCanvas.height / 2),
+                            vx: (Math.random() - 0.5) * 6,
+                            vy: (Math.random() - 0.5) * 6,
+                            alpha: 1,
+                            color: `hsl(${Math.random() * 360}, 100%, 60%)`
+                        });
+                    }
+                    fireworksAnimId = requestAnimationFrame(loopFireworks);
+                }
+            }
+        }
+
+        function stopFireworks() {
+            if (fireworksAnimId) {
+                cancelAnimationFrame(fireworksAnimId);
+            }
+            if (fwCanvas) {
+                fwCanvas.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
